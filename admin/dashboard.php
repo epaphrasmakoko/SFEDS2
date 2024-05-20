@@ -8,12 +8,12 @@ error_reporting(E_ALL);
 session_start();
 
 // Include the database connection file
-require_once './php/connect_db.php';
+require_once '../php/connect_db.php';
 
 // Check if the user is logged in and is an admin
 if (!isset($_SESSION['loggedin']) || $_SESSION['email'] !== 'admin@gmail.com') {
     // Redirect to login page if not logged in or not an admin
-    header("Location: ./index.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -42,9 +42,9 @@ if ($result && $row = $result->fetch_assoc()) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
   <!-- Bootstrap CSS -->
-  <link href="./bootstrap/bootstrap-5.3.3-dist/css/bootstrap.css" rel="stylesheet">
-  <link rel="stylesheet" href="./css/general.css">
-  <link rel="stylesheet" href="./css/dashboard.css">
+  <link href="../bootstrap/bootstrap-5.3.3-dist/css/bootstrap.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/general.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body>
   <div class="dashboard">
@@ -52,7 +52,7 @@ if ($result && $row = $result->fetch_assoc()) {
     <header class="header">
       <div class="logo">
         <figure>
-          <img src="./images/secure-icon-png-4981.png" alt="Secure Logo" class="logo-img">
+          <img src="../images/secure-icon-png-4981.png" alt="Secure Logo" class="logo-img">
           <figcaption><strong>SFEDS</strong></figcaption>
         </figure>
       </div>
@@ -61,8 +61,8 @@ if ($result && $row = $result->fetch_assoc()) {
       </div>
       <div>
         <nav class="nav">
-          <a href="/dashboard/profile" class="link-light">Profile</a>
-          <a href="./php/logout.php" class="link-danger">Logout</a>
+          <a href="#" class="link-light">Profile</a>
+          <a href="../php/logout.php" class="link-danger">Logout</a>
         </nav>
       </div>
     </header>
@@ -72,9 +72,9 @@ if ($result && $row = $result->fetch_assoc()) {
       <aside class="sidebar">
         <ul>
           <hr>
-          <li><a class="link-light" href="./admin.php">Dashboard</a></li>
+          <li><a class="link-light" href="./dashboard.php">Dashboard</a></li>
           <hr>
-          <li><a class="link-light" href="#">Users</a></li>
+          <li><a class="link-light" href="./user-management.php">Users</a></li>
           <hr>
           <li><a class="link-light" href="#">Uploads</a></li>
           <hr>
@@ -91,12 +91,13 @@ if ($result && $row = $result->fetch_assoc()) {
           <h1>Welcome Admin</h1>
             <!-- Embedding the video -->
           <video autoplay loop muted class="video">
-            <source src="./images/Lock_video.mp4" type="video/mp4">
+            <source src="../images/Lock_video.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </div>
       </div>
     </div>
+    
     <!-- Footer Component -->
     <footer class="footer">
       <p>&copy; 2024 CSDFE3 Group. All rights reserved.</p>
@@ -104,6 +105,6 @@ if ($result && $row = $result->fetch_assoc()) {
   </div>
 
   <!-- Bootstrap JS (optional) -->
-  <script src="./bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

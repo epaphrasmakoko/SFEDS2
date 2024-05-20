@@ -24,6 +24,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // User exists, fetch the user data
         $user = $result->fetch_assoc();
 
+        // Check if the user is active
+        if ($user['is_active'] == 0) {
+            // User is disabled
+            $_SESSION['login_error'] = "Your account has been disabled. Please contact the administrator.";
+            header("Location: ../index.php");
+            exit();
+        }
+
         // Verify the password
         if (password_verify($password, $user['password'])) {
             // Password is correct, set session variables and redirect to dashboard
@@ -33,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Redirect based on user role
             if ($email === 'admin@gmail.com') {
-                header("Location: ../admin.php");
+                header("Location: ../admin/dashboard.php");
             } else {
                 header("Location: ../dashboard.php");
             }
