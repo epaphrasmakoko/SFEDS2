@@ -1,0 +1,40 @@
+/* register css */
+
+.scrollable-card-body {
+    max-height: 75vh; /* Set a maximum height for the card body */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+  }
+  
+  .logo {
+    padding-top: 5px;
+    max-width: 80px;
+  }
+  
+  .registration-form {
+    width: 100%;
+    padding: 40px;
+    background-color: bisque;
+    color: black;
+    border-radius: 10px;
+    box-shadow: 0 20px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 30px;
+  }
+  
+  label {
+    display: block;
+    font-weight: bold;
+  }
+  
+  button {
+    width: 100%;
+    padding: 10px;
+  }
+  
+  .form1 {
+    color: bisque;
+    background-color: black;
+    border: 0cap;
+  }

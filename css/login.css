@@ -1,0 +1,49 @@
+  /* Login page styles */
+  
+  .login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: black;
+    color: bisque;
+  }
+
+  .login-form {
+    width: 100%;
+    padding: 40px;
+    background-color: bisque;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .form1 {
+    border: none ;
+  }
+
+  .logo {
+    max-width: 150px; /* Adjust the max-width value as needed */
+    margin-bottom: 40px; /* Optional: Add some margin below the logo */
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    display: block;
+    font-weight: bold;
+  }
+  
+  button {
+    width: 100% ;
+    padding: 10px !important;
+  }
+
+  .card-body{
+    background-color: black;
+  }
+  .mt-3{
+    color: bisque;
+  }
+  
