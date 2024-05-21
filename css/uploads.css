@@ -1,0 +1,19 @@
+.arrow {
+    width: 400px;
+    display: flex;
+    justify-content: left;
+    text-align: left;
+  }
+  
+  .items {
+    text-align: left;
+  }
+  
+  ul li {
+    margin: 10px;
+  }
+  
+  .back-icon {
+    width: 30px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+  }

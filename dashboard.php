@@ -47,11 +47,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
       <aside class="sidebar">
         <ul>
           <hr>
-          <li><a class="link-light" href="/dashboard">Dashboard</a></li>
+          <li><a class="link-light" href="./dashboard.php">Dashboard</a></li>
           <hr>
-          <li><a class="link-light" href="/dashboard/enrolled-courses">Upload</a></li>
+          <li><a class="link-light" href="#">Upload</a></li>
           <hr>
-          <li><a class="link-light" href="/dashboard/profile">Profile</a></li>
+          <li><a class="link-light" href="#">Profile</a></li>
           <hr>
         </ul>
       </aside>
@@ -63,19 +63,19 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     <!-- Add six folders, split into top and bottom groups -->
     <div class="folders">
       <div class="top-folders">
-        <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+        <a href="./dashboard/user-documents.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
           <div class="folder-item">
             <img src="./images/documents-512.png" alt="folder" class="folder">
             <span class="folder-name">Documents</span>
           </div>
         </a>
-        <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+        <a href="./dashboard/user-pictures.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
           <div class="folder-item">
             <img src="./images/pictures-512.png" alt="folder" class="folder">
             <span class="folder-name">Pictures</span>
           </div>
         </a>
-        <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+        <a href="./dashboard/user-others.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
           <div class="folder-item">
             <img src="./images/folder-3-512.png" alt="folder" class="folder">
             <span class="folder-name">Others</span>
@@ -83,19 +83,19 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         </a>
       </div>
       <div class="bottom-folders">
-        <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+        <a href="./dashboard/user-videos.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
             <div class="folder-item">
               <img src="./images/movies-512.png" alt="folder" class="folder">
               <span class="folder-name">Videos</span>
             </div>
         </a>
-        <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+        <a href="./dashboard/user-musics.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
           <div class="folder-item">
             <img src="./images/music-512.png" alt="folder" class="folder">
             <span class="folder-name">Music</span>
           </div>
         </a>
-        <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+        <a href="./dashboard/user-shared.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
           <div class="folder-item">
             <img src="./images/full-folder-512.png" alt="folder" class="folder">
             <span class="folder-name">Shared</span>
