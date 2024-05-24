@@ -8,6 +8,29 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ./index.php");
     exit();
 }
+
+// Include the database connection file
+require_once './php/connect_db.php';
+
+// Retrieve user details from the database
+$email = $_SESSION['email'];
+$sql = "SELECT first_name, last_name, email, phone_number FROM users WHERE email = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+if ($user) {
+    $fullName = $user['first_name'] . ' ' . $user['last_name'];
+    $email = $user['email'];
+    $phoneNumber = $user['phone_number'];
+} else {
+    // User not found, handle error (optional)
+}
+
+$stmt->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -15,11 +38,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Profile</title>
   <!-- Bootstrap CSS -->
   <link href="./bootstrap/bootstrap-5.3.3-dist/css/bootstrap.css" rel="stylesheet">
   <link rel="stylesheet" href="./css/general.css">
   <link rel="stylesheet" href="./css/dashboard.css">
+  <link rel="stylesheet" href="./css/profile.css">
 </head>
 <body>
   <div class="dashboard">
@@ -57,53 +81,27 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
       </aside>
       <!-- Main content area -->
       <div class="content">
-        <div>
-        <div class="personal-information">
-    <h2><u>Personal Files</u></h2>
-    <!-- Add six folders, split into top and bottom groups -->
-    <div class="folders">
-      <div class="top-folders">
-        <a href="./dashboard/user-documents.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/documents-512.png" alt="folder" class="folder">
-            <span class="folder-name">Documents</span>
+        <div class="profile-settings">
+          <h2><u><strong>Profile Settings</strong></u></h2>
+          <div class=info>
+            <p>Full Name: <strong><?php echo htmlspecialchars($fullName); ?></strong></p>
+            <p>Email: <strong><?php echo htmlspecialchars($email); ?></strong></p>
+            <p>Phone Number: <strong><?php echo htmlspecialchars($phoneNumber); ?></strong></p>
           </div>
-        </a>
-        <a href="./dashboard/user-pictures.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/pictures-512.png" alt="folder" class="folder">
-            <span class="folder-name">Pictures</span>
-          </div>
-        </a>
-        <a href="./dashboard/user-others.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/folder-3-512.png" alt="folder" class="folder">
-            <span class="folder-name">Others</span>
-          </div>
-        </a>
-      </div>
-      <div class="bottom-folders">
-        <a href="./dashboard/user-videos.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-            <div class="folder-item">
-              <img src="./images/movies-512.png" alt="folder" class="folder">
-              <span class="folder-name">Videos</span>
+
+          <form method="POST" action="./php/update_profile.php" class="needs-validation" novalidate>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" class="form-control" required>
+              <div class="invalid-feedback">Password should be at least 8 characters long and contain uppercase and lowercase letters, numbers, and special characters</div>
             </div>
-        </a>
-        <a href="./dashboard/user-musics.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/music-512.png" alt="folder" class="folder">
-            <span class="folder-name">Music</span>
-          </div>
-        </a>
-        <a href="./dashboard/user-shared.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/full-folder-512.png" alt="folder" class="folder">
-            <span class="folder-name">Shared</span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </div>
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+              <div class="invalid-feedback">Passwords do not match</div>
+            </div>
+            <button type="submit" class="btn btn-dark">Save Changes</button>
+          </form>
         </div>
         <div>
           <h1>Welcome <?php echo htmlspecialchars($_SESSION['first_name']); ?></h1>

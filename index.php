@@ -29,10 +29,11 @@
                   unset($_SESSION['login_error']);
               }
               ?>
-              <form action="./php/login.php" method="POST" class="login-form">
+              <form action="./php/login.php" method="POST" class="login-form needs-validation" novalidate>
                 <h2 class="card-title">Login</h2>
                 <div class="form-group">
                   <input type="email" name="email" class="form-control" required placeholder="Email">
+                  <div class="invalid-feedback">Please provide a valid email address</div>
                 </div>
                 <div class="form-group">
                   <input type="password" name="password" class="form-control" required placeholder="Password">

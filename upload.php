@@ -20,6 +20,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
   <link href="./bootstrap/bootstrap-5.3.3-dist/css/bootstrap.css" rel="stylesheet">
   <link rel="stylesheet" href="./css/general.css">
   <link rel="stylesheet" href="./css/dashboard.css">
+  <link rel="stylesheet" href="./css/userupload.css">
 </head>
 <body>
   <div class="dashboard">
@@ -57,54 +58,49 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
       </aside>
       <!-- Main content area -->
       <div class="content">
+
+  <div class="enrolled-courses">
+    <h2><strong><u>Upload File</u></strong></h2>
+    <!-- File upload form -->
+    <form @submit.prevent="uploadFile" class="upload-form">
+      <!-- File input -->
+      <div class="form-group upload">
+        <input type="file" id="file"
+          accept="image/*, video/*, audio/*, .pdf, .doc, .docx, .txt, .zip, .rar, .csv, .xls, .xlsx, .ppt, .pptx, .mp3, .wav, .ogg, .mp4, .mov, .avi"
+          ref="fileInput" class="form-control" required @change="handleFileChange">
+      </div>
+
+      <!-- Description input -->
+      <div class="form-group upload">
+        <textarea id="description" v-model="description" class="form-control" required
+          placeholder="Describe the File"></textarea>
+      </div>
+
+      <!-- Encryption method choice -->
+      <label class="radioTitle"><u><strong>Choose Encryption Method:</strong></u></label>
+      <div class="form-group methods">
         <div>
-        <div class="personal-information">
-    <h2><u>Personal Files</u></h2>
-    <!-- Add six folders, split into top and bottom groups -->
-    <div class="folders">
-      <div class="top-folders">
-        <a href="./dashboard/user-documents.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/documents-512.png" alt="folder" class="folder">
-            <span class="folder-name">Documents</span>
-          </div>
-        </a>
-        <a href="./dashboard/user-pictures.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/pictures-512.png" alt="folder" class="folder">
-            <span class="folder-name">Pictures</span>
-          </div>
-        </a>
-        <a href="./dashboard/user-others.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/folder-3-512.png" alt="folder" class="folder">
-            <span class="folder-name">Others</span>
-          </div>
-        </a>
-      </div>
-      <div class="bottom-folders">
-        <a href="./dashboard/user-videos.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-            <div class="folder-item">
-              <img src="./images/movies-512.png" alt="folder" class="folder">
-              <span class="folder-name">Videos</span>
-            </div>
-        </a>
-        <a href="./dashboard/user-musics.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/music-512.png" alt="folder" class="folder">
-            <span class="folder-name">Music</span>
-          </div>
-        </a>
-        <a href="./dashboard/user-shared.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          <div class="folder-item">
-            <img src="./images/full-folder-512.png" alt="folder" class="folder">
-            <span class="folder-name">Shared</span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </div>
+          <label>
+            <input type="radio" v-model="encryptionMethod" value="generatedKey"> Encrypt using auto-generated Key
+          </label>
         </div>
+        <div>
+          <label>
+            <input type="radio" v-model="encryptionMethod" value="passphrase"> Encrypt using passphrase
+          </label>
+        </div>
+      </div>
+      <hr>
+
+      <!-- Passphrase input -->
+      <div v-if="encryptionMethod === 'passphrase'">
+        <label for="passphrase">Passphrase:</label>
+        <input type="password" id="passphrase" v-model="passphrase" class="form-control" required >
+      </div>
+
+      <button type="submit" class="btn btn-secondary upload">Submit</button>
+    </form>
+  </div>
         <div>
           <h1>Welcome <?php echo htmlspecialchars($_SESSION['first_name']); ?></h1>
             <!-- Embedding the video -->

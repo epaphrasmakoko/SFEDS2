@@ -1,0 +1,17 @@
+.radioTitle {
+    margin-bottom: 10px;
+  }
+  .methods {
+    text-align: left;
+    margin-left: 20px;
+  }
+  .enrolled-courses {
+    margin-bottom: 20px;
+  }
+  .upload-form {
+    display: flex;
+    flex-direction: column;
+  }
+  .upload {
+    margin: 20px;
+  }

@@ -50,9 +50,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
           <hr>
           <li><a class="link-light" href="../dashboard.php">Dashboard</a></li>
           <hr>
+          <li><a class="link-light" href="./user-management.php">Users</a></li>
+          <hr>
           <li><a class="link-light" href="#">Upload</a></li>
           <hr>
-          <li><a class="link-light" href="#">Profile</a></li>
+          <li><a class="link-light" href="../profile.php">Profile</a></li>
+          <hr>
+          <li><a class="link-light" href="#">Logs</a></li>
           <hr>
         </ul>
       </aside>

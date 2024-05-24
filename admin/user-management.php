@@ -18,7 +18,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['email'] !== 'admin@gmail.com') {
 }
 
 // Fetch all users from the database
-$sql = "SELECT id, first_name, last_name, email, is_active FROM users";
+$sql = "SELECT id, first_name, last_name, email, phone_number, is_active FROM users";
 $result = $conn->query($sql);
 ?>
 
@@ -67,6 +67,8 @@ $result = $conn->query($sql);
                     <hr>
                     <li><a class="link-light" href="#">Profile</a></li>
                     <hr>
+                    <li><a class="link-light" href="#">Logs</a></li>
+                    <hr>
                 </ul>
             </aside>
             <!-- Main content area -->
@@ -79,6 +81,7 @@ $result = $conn->query($sql);
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Email</th>
+                                <th>Phone</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -89,6 +92,7 @@ $result = $conn->query($sql);
                                         <td><?php echo htmlspecialchars($row['first_name']); ?></td>
                                         <td><?php echo htmlspecialchars($row['last_name']); ?></td>
                                         <td><?php echo htmlspecialchars($row['email']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['phone_number']); ?></td>
                                         <td>
                                             <form action="../php/user_actions.php" method="post" style="display:inline;">
                                                 <input type="hidden" name="user_id" value="<?php echo $row['id']; ?>">
