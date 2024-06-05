@@ -80,14 +80,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
       <label class="radioTitle"><u><strong>Choose Encryption Method:</strong></u></label>
       <div class="form-group methods">
         <div>
-          <label>
-            <input type="radio" v-model="encryptionMethod" value="generatedKey"> Encrypt using auto-generated Key
-          </label>
-        </div>
-        <div>
-          <label>
-            <input type="radio" v-model="encryptionMethod" value="passphrase"> Encrypt using passphrase
-          </label>
+            <input id="generatedKey" type="radio" name="uploadType" value="generatedKey">
+            <label for="generatedKey">Encrypt using auto-generated Key</label><br>
+            <input id="passphrase" type="radio" name="uploadType" value="passphrase">
+            <label for="passphrase">Encrypt using passphrase</lable>
         </div>
       </div>
       <hr>
