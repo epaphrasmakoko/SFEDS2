@@ -91,7 +91,7 @@ $conn->close();
 
           <form method="POST" action="./php/update_profile.php" class="needs-validation" novalidate>
             <div class="form-group">
-              <label for="password">Password</label>
+              <label for="password">New Password</label>
               <input type="password" id="password" name="password" class="form-control" required>
               <div class="invalid-feedback">Password should be at least 8 characters long and contain uppercase and lowercase letters, numbers, and special characters</div>
             </div>

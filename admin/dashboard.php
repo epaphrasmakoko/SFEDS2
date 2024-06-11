@@ -78,7 +78,7 @@ if ($result && $row = $result->fetch_assoc()) {
           <hr>
           <li><a class="link-light" href="#">Uploads</a></li>
           <hr>
-          <li><a class="link-light" href="../profile.php">Profile</a></li>
+          <li><a class="link-light" href="#">Profile</a></li>
           <hr>
           <li><a class="link-light" href="#">Logs</a></li>
           <hr>

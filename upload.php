@@ -62,40 +62,34 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
   <div class="enrolled-courses">
     <h2><strong><u>Upload File</u></strong></h2>
     <!-- File upload form -->
-    <form @submit.prevent="uploadFile" class="upload-form">
-      <!-- File input -->
-      <div class="form-group upload">
-        <input type="file" id="file"
-          accept="image/*, video/*, audio/*, .pdf, .doc, .docx, .txt, .zip, .rar, .csv, .xls, .xlsx, .ppt, .pptx, .mp3, .wav, .ogg, .mp4, .mov, .avi"
-          ref="fileInput" class="form-control" required @change="handleFileChange">
-      </div>
+    <form action="./php/upload_handler.php" method="post" enctype="multipart/form-data" class="upload-form">
+  <div class="form-group upload">
+    <input type="file" name="file" id="file" accept="image/*, video/*, audio/*, .pdf, .doc, .docx, .txt, .zip, .rar, .csv, .xls, .xlsx, .ppt, .pptx, .mp3, .wav, .ogg, .mp4, .mov, .avi" class="form-control" required>
+  </div>
 
-      <!-- Description input -->
-      <div class="form-group upload">
-        <textarea id="description" v-model="description" class="form-control" required
-          placeholder="Describe the File"></textarea>
-      </div>
+  <div class="form-group upload">
+    <textarea id="description" name="description" class="form-control" required placeholder="Describe the File"></textarea>
+  </div>
 
-      <!-- Encryption method choice -->
-      <label class="radioTitle"><u><strong>Choose Encryption Method:</strong></u></label>
-      <div class="form-group methods">
-        <div>
-            <input id="generatedKey" type="radio" name="uploadType" value="generatedKey">
-            <label for="generatedKey">Encrypt using auto-generated Key</label><br>
-            <input id="passphrase" type="radio" name="uploadType" value="passphrase">
-            <label for="passphrase">Encrypt using passphrase</lable>
-        </div>
-      </div>
-      <hr>
+  <label class="radioTitle"><u><strong>Choose Encryption Method:</strong></u></label>
+  <div class="form-group methods">
+    <div>
+      <input id="generatedKey" type="radio" name="uploadType" value="generatedKey" onclick="handleEncryptionMethodChange('generatedKey')" required>
+      <label for="generatedKey">Encrypt using auto-generated Key</label><br>
+      <input id="passphraseOption" type="radio" name="uploadType" value="passphrase" onclick="handleEncryptionMethodChange('passphrase')" required>
+      <label for="passphraseOption">Encrypt using passphrase</label>
+    </div>
+  </div>
+  <hr>
 
-      <!-- Passphrase input -->
-      <div v-if="encryptionMethod === 'passphrase'">
-        <label for="passphrase">Passphrase:</label>
-        <input type="password" id="passphrase" v-model="passphrase" class="form-control" required >
-      </div>
+  <div class="form-group" id="passphraseDiv">
+    <label for="passphrase">Passphrase:</label>
+    <input type="password" id="passphraseInput" name="passphrase" class="form-control" required>
+  </div>
 
-      <button type="submit" class="btn btn-secondary upload">Submit</button>
-    </form>
+  <button type="submit" class="btn btn-secondary upload">Submit</button>
+</form>
+
   </div>
         <div>
           <h1>Welcome <?php echo htmlspecialchars($_SESSION['first_name']); ?></h1>
@@ -115,5 +109,29 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
   <!-- Bootstrap JS (optional) -->
   <script src="./bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function generateRandomString(length) {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+      let result = '';
+      const charactersLength = characters.length;
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
+    }
+
+    function handleEncryptionMethodChange(method) {
+      const passphraseInput = document.getElementById('passphraseInput');
+      if (method === 'generatedKey') {
+        const randomPassphrase = generateRandomString(16);
+        passphraseInput.value = randomPassphrase;
+        passphraseInput.disabled = true;
+      } else if (method === 'passphrase') {
+        passphraseInput.value = '';
+        passphraseInput.disabled = false;
+      }
+    }
+  </script>
 </body>
 </html>

@@ -95,7 +95,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
             <span class="folder-name">Music</span>
           </div>
         </a>
-        <a href="./dashboard/user-shared.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+        <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
           <div class="folder-item">
             <img src="./images/full-folder-512.png" alt="folder" class="folder">
             <span class="folder-name">Shared</span>
