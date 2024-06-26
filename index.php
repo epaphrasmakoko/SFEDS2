@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,22 @@
   <link href="./bootstrap/bootstrap-5.3.3-dist/css/bootstrap.css" rel="stylesheet">
   <link rel="stylesheet" href="./css/login.css">
   <link rel="stylesheet" href="./css/general.css">
+  <style>
+    .input-group-text {
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
   <div class="login-page">
     <div class="container">
       <div class="row justify-content-center mt-5">
         <div class="col-md-5">
           <figure>
-            <figcaption><h5><strong>SECURE FILE ENCRYPTION AND DECRYPTION SYSTEM</strong></h5></figcaption>
+            <figcaption>
+              <h5><strong>SECURE FILE ENCRYPTION AND DECRYPTION SYSTEM</strong></h5>
+            </figcaption>
             <img src="./images/secure-icon-png-4981.png" alt="Logo" class="logo">
           </figure>
           <div class="card form1">
@@ -22,11 +31,11 @@
               <?php
               // Start session
               session_start();
-              
+
               // Display login error if exists
               if (isset($_SESSION['login_error'])) {
-                  echo '<div class="alert alert-danger" role="alert">' . $_SESSION['login_error'] . '</div>';
-                  unset($_SESSION['login_error']);
+                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['login_error'] . '</div>';
+                unset($_SESSION['login_error']);
               }
               ?>
               <form action="./php/login.php" method="POST" class="login-form needs-validation" novalidate>
@@ -36,7 +45,13 @@
                   <div class="invalid-feedback">Please provide a valid email address</div>
                 </div>
                 <div class="form-group">
-                  <input type="password" name="password" class="form-control" required placeholder="Password">
+                  <div class="input-group">
+                    <input type="password" name="password" id="password" class="form-control" required placeholder="Password">
+                    <span class="input-group-text" id="toggle-password">
+                      <i class="bi bi-eye-slash" id="toggle-password-icon"> <img src="./eye-slash.svg" alt="Show password" width="16" height="16"></i>
+                    </span>
+                  </div>
+                  <div class="invalid-feedback">Please provide a password</div>
                 </div>
                 <div class="form-group form-check">
                   <input type="checkbox" id="rememberMe" name="rememberMe" class="form-check-input">
@@ -77,6 +92,23 @@
 
   <script src="./bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.js"></script>
   <script src="./jquery/jquery.js"></script>
+  <script>
+    function togglePassword() {
+      const password = document.getElementById('password');
+      const icon = document.getElementById('toggle-password-icon');
+      if (password.type === 'password') {
+        password.type = 'text';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      } else {
+        password.type = 'password';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+      }
+    }
+
+    document.getElementById('toggle-password').addEventListener('click', togglePassword);
+  </script>
 
   <?php
   // Check if registration was successful and display modal
@@ -84,14 +116,15 @@
     // Unset session variable
     unset($_SESSION['registration_successful']);
   ?>
-  <script>
-    // JavaScript to show the modal
-    $(document).ready(function() {
-      $('#registrationCompleteModal').modal('show');
-    });
-  </script>
+    <script>
+      // JavaScript to show the modal
+      $(document).ready(function() {
+        $('#registrationCompleteModal').modal('show');
+      });
+    </script>
   <?php
   }
   ?>
 </body>
+
 </html>

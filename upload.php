@@ -1,30 +1,36 @@
 <?php
-// Start session
 session_start();
 
-// Check if the user is logged in
+// Redirect if not logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // Redirect to login page
-    header("Location: ./index.php");
-    exit();
+  header("Location: ./index.php");
+  exit();
+}
+
+// Check for upload errors from session
+if (isset($_SESSION['upload_error'])) {
+  $uploadError = $_SESSION['upload_error'];
+  unset($_SESSION['upload_error']); // Clear the session error
+} else {
+  $uploadError = "";
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <!-- Bootstrap CSS -->
+  <title>Upload Files</title>
   <link href="./bootstrap/bootstrap-5.3.3-dist/css/bootstrap.css" rel="stylesheet">
   <link rel="stylesheet" href="./css/general.css">
   <link rel="stylesheet" href="./css/dashboard.css">
   <link rel="stylesheet" href="./css/userupload.css">
 </head>
+
 <body>
   <div class="dashboard">
-    <!-- Header Component -->
     <header class="header">
       <div class="logo">
         <figure>
@@ -42,9 +48,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         </nav>
       </div>
     </header>
-    <!-- Main Component -->
     <div class="main">
-      <!-- Sidebar Component -->
       <aside class="sidebar">
         <ul>
           <hr>
@@ -56,44 +60,49 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
           <hr>
         </ul>
       </aside>
-      <!-- Main content area -->
       <div class="content">
+        <div class="enrolled-courses">
+          <h2><strong><u>Upload File</u></strong></h2>
 
-  <div class="enrolled-courses">
-    <h2><strong><u>Upload File</u></strong></h2>
-    <!-- File upload form -->
-    <form action="./php/upload_handler.php" method="post" enctype="multipart/form-data" class="upload-form">
-  <div class="form-group upload">
-    <input type="file" name="file" id="file" accept="image/*, video/*, audio/*, .pdf, .doc, .docx, .txt, .zip, .rar, .csv, .xls, .xlsx, .ppt, .pptx, .mp3, .wav, .ogg, .mp4, .mov, .avi" class="form-control" required>
-  </div>
+          <!-- Display upload error if present -->
+          <?php if (!empty($uploadError)) : ?>
+            <div class="alert alert-danger" role="alert">
+              <?php echo htmlspecialchars($uploadError); ?>
+            </div>
+          <?php endif; ?>
 
-  <div class="form-group upload">
-    <textarea id="description" name="description" class="form-control" required placeholder="Describe the File"></textarea>
-  </div>
+          <?php
+          if (isset($_SESSION['upload_success'])) {
+            echo '<div class="alert alert-success">The file has been uploaded and encrypted.</div>';
+            unset($_SESSION['upload_success']);
+          }
+          ?>
 
-  <label class="radioTitle"><u><strong>Choose Encryption Method:</strong></u></label>
-  <div class="form-group methods">
-    <div>
-      <input id="generatedKey" type="radio" name="uploadType" value="generatedKey" onclick="handleEncryptionMethodChange('generatedKey')" required>
-      <label for="generatedKey">Encrypt using auto-generated Key</label><br>
-      <input id="passphraseOption" type="radio" name="uploadType" value="passphrase" onclick="handleEncryptionMethodChange('passphrase')" required>
-      <label for="passphraseOption">Encrypt using passphrase</label>
-    </div>
-  </div>
-  <hr>
 
-  <div class="form-group" id="passphraseDiv">
-    <label for="passphrase">Passphrase:</label>
-    <input type="password" id="passphraseInput" name="passphrase" class="form-control" required>
-  </div>
+          <form action="./php/upload_handler.php" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="form-group upload">
+              <input type="file" name="file" id="file" accept="application/pdf, image/png, image/jpeg, image/jpg" class="form-control" required>
+            </div>
 
-  <button type="submit" class="btn btn-secondary upload">Submit</button>
-</form>
+            <div class="form-group upload">
+              <textarea id="description" name="description" class="form-control" required placeholder="Describe the File"></textarea>
+            </div>
+            <hr>
+            <div class="form-group" id="passphraseDiv">
+              <label for="passphrase"><strong><u>You must Never forget this Passphrase we cannot recover it...</u></strong></label><br><br>
+              <div class="input-group">
+                <input type="password" id="passphraseInput" name="passphrase" class="form-control" placeholder="Enter your passphrase" required>
+                <span class="input-group-text" id="toggle-passphrase">
+                  <i class="bi bi-eye-slash" id="toggle-passphrase-icon"> <img src="./eye-slash.svg" alt="Show passphrase" width="16" height="16"></i>
+                </span>
+              </div>
+            </div>
 
-  </div>
+            <button type="submit" class="btn btn-secondary upload">Submit</button>
+          </form>
+        </div>
         <div>
           <h1>Welcome <?php echo htmlspecialchars($_SESSION['first_name']); ?></h1>
-            <!-- Embedding the video -->
           <video autoplay loop muted class="video">
             <source src="./images/Lock_video.mp4" type="video/mp4">
             Your browser does not support the video tag.
@@ -101,37 +110,30 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         </div>
       </div>
     </div>
-    <!-- Footer Component -->
     <footer class="footer">
       <p>&copy; 2024 CSDFE3 Group. All rights reserved.</p>
     </footer>
   </div>
 
-  <!-- Bootstrap JS (optional) -->
   <script src="./bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    function generateRandomString(length) {
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
-      let result = '';
-      const charactersLength = characters.length;
-      for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    function togglePassphrase() {
+      const passphrase = document.getElementById('passphraseInput');
+      const icon = document.getElementById('toggle-passphrase-icon');
+      if (passphrase.type === 'password') {
+        passphrase.type = 'text';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      } else {
+        passphrase.type = 'password';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
       }
-      return result;
     }
 
-    function handleEncryptionMethodChange(method) {
-      const passphraseInput = document.getElementById('passphraseInput');
-      if (method === 'generatedKey') {
-        const randomPassphrase = generateRandomString(16);
-        passphraseInput.value = randomPassphrase;
-        passphraseInput.disabled = true;
-      } else if (method === 'passphrase') {
-        passphraseInput.value = '';
-        passphraseInput.disabled = false;
-      }
-    }
+    document.getElementById('toggle-passphrase').addEventListener('click', togglePassphrase);
   </script>
 </body>
+
 </html>

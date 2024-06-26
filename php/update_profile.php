@@ -16,8 +16,25 @@ require_once 'connect_db.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
     $email = $_SESSION['email'];
+    $currentPassword = $conn->real_escape_string($_POST['currentPassword']);
     $password = $conn->real_escape_string($_POST['password']);
     $confirmPassword = $conn->real_escape_string($_POST['confirmPassword']);
+
+    // Retrieve the current hashed password from the database
+    $sql = "SELECT password FROM users WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->bind_result($hashedPasswordFromDb);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Verify the current password
+    if (!password_verify($currentPassword, $hashedPasswordFromDb)) {
+        $_SESSION['update_error'] = "Current password is incorrect.";
+        header("Location: ../profile.php");
+        exit();
+    }
 
     // Validate passwords
     if ($password !== $confirmPassword) {
@@ -53,4 +70,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: ../profile.php");
     exit();
 }
-?>

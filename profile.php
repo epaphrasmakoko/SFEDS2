@@ -44,6 +44,11 @@ $conn->close();
   <link rel="stylesheet" href="./css/general.css">
   <link rel="stylesheet" href="./css/dashboard.css">
   <link rel="stylesheet" href="./css/profile.css">
+  <style>
+    .input-group-text {
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="dashboard">
@@ -83,7 +88,20 @@ $conn->close();
       <div class="content">
         <div class="profile-settings">
           <h2><u><strong>Profile Settings</strong></u></h2>
-          <div class=info>
+
+          <?php
+          if (isset($_SESSION['update_error'])) {
+              echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['update_error']) . '</div>';
+              unset($_SESSION['update_error']);
+          }
+
+          if (isset($_SESSION['update_successful'])) {
+              echo '<div class="alert alert-success">Password updated successfully.</div>';
+              unset($_SESSION['update_successful']);
+          }
+          ?>
+
+          <div class="info">
             <p>Full Name: <strong><?php echo htmlspecialchars($fullName); ?></strong></p>
             <p>Email: <strong><?php echo htmlspecialchars($email); ?></strong></p>
             <p>Phone Number: <strong><?php echo htmlspecialchars($phoneNumber); ?></strong></p>
@@ -91,13 +109,33 @@ $conn->close();
 
           <form method="POST" action="./php/update_profile.php" class="needs-validation" novalidate>
             <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <div class="input-group">
+                <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+                <span class="input-group-text" id="toggle-current-password">
+                  <i class="bi bi-eye-slash" id="toggle-current-password-icon"> <img src="./eye-slash.svg" alt="Show password" width="16" height="16"></i>
+                </span>
+              </div>
+              <div class="invalid-feedback">Please enter your current password</div>
+            </div>
+            <div class="form-group">
               <label for="password">New Password</label>
-              <input type="password" id="password" name="password" class="form-control" required>
+              <div class="input-group">
+                <input type="password" id="password" name="password" class="form-control" required>
+                <span class="input-group-text" id="toggle-new-password">
+                  <i class="bi bi-eye-slash" id="toggle-new-password-icon"> <img src="./eye-slash.svg" alt="Show password" width="16" height="16"></i>
+                </span>
+              </div>
               <div class="invalid-feedback">Password should be at least 8 characters long and contain uppercase and lowercase letters, numbers, and special characters</div>
             </div>
             <div class="form-group">
               <label for="confirmPassword">Confirm Password</label>
-              <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+              <div class="input-group">
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                <span class="input-group-text" id="toggle-confirm-password">
+                  <i class="bi bi-eye-slash" id="toggle-confirm-password-icon"> <img src="./eye-slash.svg" alt="Show password" width="16" height="16"></i>
+                </span>
+              </div>
               <div class="invalid-feedback">Passwords do not match</div>
             </div>
             <button type="submit" class="btn btn-dark">Save Changes</button>
@@ -105,7 +143,7 @@ $conn->close();
         </div>
         <div>
           <h1>Welcome <?php echo htmlspecialchars($_SESSION['first_name']); ?></h1>
-            <!-- Embedding the video -->
+          <!-- Embedding the video -->
           <video autoplay loop muted class="video">
             <source src="./images/Lock_video.mp4" type="video/mp4">
             Your browser does not support the video tag.
@@ -121,5 +159,32 @@ $conn->close();
 
   <!-- Bootstrap JS (optional) -->
   <script src="./bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function togglePassword(fieldId, iconId) {
+      const password = document.getElementById(fieldId);
+      const icon = document.getElementById(iconId);
+      if (password.type === 'password') {
+        password.type = 'text';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      } else {
+        password.type = 'password';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+      }
+    }
+
+    document.getElementById('toggle-current-password').addEventListener('click', function() {
+      togglePassword('currentPassword', 'toggle-current-password-icon');
+    });
+
+    document.getElementById('toggle-new-password').addEventListener('click', function() {
+      togglePassword('password', 'toggle-new-password-icon');
+    });
+
+    document.getElementById('toggle-confirm-password').addEventListener('click', function() {
+      togglePassword('confirmPassword', 'toggle-confirm-password-icon');
+    });
+  </script>
 </body>
 </html>

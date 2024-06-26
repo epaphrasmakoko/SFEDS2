@@ -119,7 +119,7 @@ $conn->close();
     </div>
     <!-- Footer Component -->
     <footer class="footer">
-      <p>&copy; 2024 CSDFE3 Group. All rights reserved.</p>
+      <p>&copy; 2024 CSDFE3 Group . All rights reserved.</p>
     </footer>
   </div>
 
