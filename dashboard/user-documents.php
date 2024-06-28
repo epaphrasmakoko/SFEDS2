@@ -132,13 +132,16 @@ $conn->close();
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="downloadForm">
+          <form id="fileActionForm">
             <div class="mb-3">
               <label for="passphrase" class="form-label">Passphrase</label>
               <input type="password" class="form-control" id="passphrase" name="passphrase" required>
               <input type="hidden" id="file_id" name="file_id">
             </div>
-            <button type="submit" class="btn btn-primary">Download</button>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
+              <button type="submit" class="btn btn-primary" id="downloadButton">Download</button>
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -158,38 +161,63 @@ $conn->close();
       passphraseModal.show();
     }
 
-    document.getElementById('downloadForm').addEventListener('submit', function(event) {
+    document.getElementById('fileActionForm').addEventListener('submit', function(event) {
       event.preventDefault();
       const formData = new FormData(this);
+      const action = document.getElementById('downloadButton').clicked ? 'download' : 'delete';
+      const url = action === 'download' ? '../download.php' : '../delete.php';
 
-      fetch('../download.php', {
+      fetch(url, {
         method: 'POST',
         body: formData
       })
-      .then(response => response.blob())
-      .then(blob => {
-        const errorMessage = document.getElementById('error-message');
-        if (blob.type === 'application/json') {
-          // Handle error response
-          blob.text().then(text => {
-            const error = JSON.parse(text);
-            errorMessage.textContent = error.message;
-          });
+      .then(response => {
+        if (action === 'download') {
+          return response.blob();
         } else {
-          // Create a link to download the file
-          const fileURL = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = fileURL;
-          a.download = document.getElementById('fileName').textContent;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          const passphraseModal = bootstrap.Modal.getInstance(document.getElementById('passphraseModal'));
-          passphraseModal.hide();
-          errorMessage.textContent = '';
+          return response.json();
+        }
+      })
+      .then(data => {
+        const errorMessage = document.getElementById('error-message');
+        if (action === 'download') {
+          if (data.type === 'application/json') {
+            // Handle error response
+            data.text().then(text => {
+              const error = JSON.parse(text);
+              errorMessage.textContent = error.message;
+            });
+          } else {
+            // Create a link to download the file
+            const fileURL = URL.createObjectURL(data);
+            const a = document.createElement('a');
+            a.href = fileURL;
+            a.download = document.getElementById('fileName').textContent;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            const passphraseModal = bootstrap.Modal.getInstance(document.getElementById('passphraseModal'));
+            passphraseModal.hide();
+            errorMessage.textContent = '';
+          }
+        } else {
+          if (data.success) {
+            location.reload();
+          } else {
+            errorMessage.textContent = data.message;
+          }
         }
       })
       .catch(error => console.error('Error:', error));
+    });
+
+    document.getElementById('deleteButton').addEventListener('click', function() {
+      document.getElementById('downloadButton').clicked = false;
+      document.getElementById('fileActionForm').submit();
+    });
+
+    document.getElementById('downloadButton').addEventListener('click', function() {
+      document.getElementById('downloadButton').clicked = true;
     });
   </script>
 </body>

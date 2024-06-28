@@ -7,58 +7,76 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-// Include database connection
-include 'connect_db.php';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Include database connection
+    include './php/connect_db.php';
 
-// Get file ID and passphrase from POST request
-$fileId = $_POST['file_id'];
-$passphrase = $_POST['passphrase'];
+    $fileId = $_POST['file_id'];
+    $passphrase = $_POST['passphrase'];
 
-// Fetch the file info from the database
-$sql = "SELECT file_path, file_name FROM files WHERE id = ? AND user_email = ?";
-$stmt = $conn->prepare($sql);
-if ($stmt === false) {
-    die('Prepare failed: ' . htmlspecialchars($conn->error));
-}
-$stmt->bind_param("is", $fileId, $_SESSION['email']);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result === false) {
-    die('Execute failed: ' . htmlspecialchars($stmt->error));
-}
-
-if ($row = $result->fetch_assoc()) {
-    $encryptedFilePath = $row['file_path'];
-    $fileName = $row['file_name'];
-    $stmt->close();
-
-    // Decrypt the file
-    $decryptedFile = decryptFile($encryptedFilePath, $passphrase);
-    if ($decryptedFile === false) {
-        echo json_encode(["message" => "Incorrect passphrase."]);
-        exit();
+    // Fetch file details from the database
+    $sql = "SELECT file_name, file_path, passphrase FROM files WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        die('Prepare failed: ' . htmlspecialchars($conn->error));
+    }
+    $stmt->bind_param("i", $fileId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result === false) {
+        die('Execute failed: ' . htmlspecialchars($stmt->error));
+    }
+    if ($result->num_rows == 0) {
+        die('File not found.');
     }
 
-    // Serve the decrypted file for download
-    header('Content-Description: File Transfer');
-    header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename="' . basename($fileName) . '"');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate');
-    header('Pragma: public');
-    header('Content-Length: ' . strlen($decryptedFile));
-    echo $decryptedFile;
-} else {
-    echo json_encode(["message" => "File not found."]);
-}
-$stmt->close();
+    $file = $result->fetch_assoc();
+    $stmt->close();
 
-function decryptFile($filePath, $passphrase) {
-    $data = file_get_contents($filePath);
-    $ivLength = openssl_cipher_iv_length('AES-256-CBC');
-    $iv = substr($data, 0, $ivLength);
-    $encryptedData = substr($data, $ivLength);
-    $decryptedData = openssl_decrypt($encryptedData, 'AES-256-CBC', $passphrase, 0, $iv);
-    return $decryptedData;
+    $encryptedFilePath = $file['file_path'];
+    $originalFileName = $file['file_name'];
+
+    // Check if the provided passphrase matches the one in the database
+    if ($file['passphrase'] !== $passphrase) {
+        die('Incorrect passphrase.');
+    }
+
+    // Decrypt the file
+    try {
+        $decryptedFilePath = decryptFile($encryptedFilePath, $passphrase);
+    } catch (Exception $e) {
+        die('Error decrypting file: ' . $e->getMessage());
+    }
+
+    // Check if the decrypted file exists and its size
+    if (file_exists($decryptedFilePath)) {
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . basename($originalFileName) . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($decryptedFilePath));
+        readfile($decryptedFilePath);
+
+        // Clean up: delete the decrypted file after sending it to the user
+        unlink($decryptedFilePath);
+        exit();
+    } else {
+        die('Decrypted file not found.');
+    }
+} else {
+    header("Location: ../index.php");
+    exit();
+}
+
+function decryptFile($encryptedFilePath, $passphrase) {
+    $decryptedFilePath = str_replace('.enc', '', $encryptedFilePath);
+    $command = "openssl enc -d -aes-256-cbc -in $encryptedFilePath -out $decryptedFilePath -k $passphrase 2>&1";
+    exec($command, $output, $returnVar);
+    if ($returnVar !== 0) {
+        throw new Exception("Error decrypting file: " . implode("\n", $output));
+    }
+    return $decryptedFilePath;
 }
 ?>

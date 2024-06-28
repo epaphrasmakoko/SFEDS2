@@ -34,29 +34,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Move the uploaded file to the target directory
     if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFile)) {
         // Encrypt the file
-        $encryptedFilePath = encryptFile($targetFile, $passphrase);
+        try {
+            $encryptedFilePath = encryptFile($targetFile, $passphrase);
 
-        // Delete the original file after encryption
-        if ($encryptedFilePath) {
-            unlink($targetFile);
-        }
-
-        // Save file metadata to the database
-        $sql = "INSERT INTO files (user_email, file_name, file_path, description, passphrase, file_type) VALUES (?, ?, ?, ?, ?, ?)";
-        if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("ssssss", $userEmail, $fileName, $encryptedFilePath, $description, $passphrase, $fileType);
-            if ($stmt->execute()) {
-                $_SESSION['upload_success'] = "The file has been uploaded and encrypted.";
-                header("Location: ../upload.php");
-                exit();
+            // Delete the original file after successful encryption
+            if (file_exists($encryptedFilePath)) {
+                unlink($targetFile);
             } else {
-                $_SESSION['upload_error'] = "Error1 uploading file.";
-                header("Location: ../upload.php");
-                exit();
+                throw new Exception("Error encrypting file.");
             }
-            $stmt->close();
-        } else {
-            $_SESSION['upload_error'] = "Database error.";
+
+            // Save file metadata to the database
+            $sql = "INSERT INTO files (user_email, file_name, file_path, description, passphrase, file_type) VALUES (?, ?, ?, ?, ?, ?)";
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param("ssssss", $userEmail, $fileName, $encryptedFilePath, $description, $passphrase, $fileType);
+                if ($stmt->execute()) {
+                    $_SESSION['upload_success'] = "The file has been uploaded and encrypted.";
+                    header("Location: ../upload.php");
+                    exit();
+                } else {
+                    throw new Exception("Error uploading file metadata.");
+                }
+                $stmt->close();
+            } else {
+                throw new Exception("Database error.");
+            }
+        } catch (Exception $e) {
+            $_SESSION['upload_error'] = $e->getMessage();
             header("Location: ../upload.php");
             exit();
         }
@@ -71,11 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 function encryptFile($filePath, $passphrase) {
-    $data = file_get_contents($filePath);
-    $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('AES-256-CBC'));
-    $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $passphrase, 0, $iv);
     $encryptedFilePath = $filePath . '.enc';
-    file_put_contents($encryptedFilePath, $iv . $encryptedData);
+    $command = "openssl enc -aes-256-cbc -in $filePath -out $encryptedFilePath -k $passphrase 2>&1";
+    exec($command, $output, $returnVar);
+    if ($returnVar !== 0) {
+        throw new Exception("Error encrypting file: " . implode("\n", $output));
+    }
     return $encryptedFilePath;
 }
 ?>
