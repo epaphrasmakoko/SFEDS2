@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jun 28, 2024 at 08:54 PM
+-- Generation Time: Jun 29, 2024 at 09:52 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,8 +32,8 @@ CREATE TABLE `files` (
   `user_email` varchar(100) NOT NULL,
   `file_name` varchar(255) NOT NULL,
   `file_path` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `passphrase` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `passphrase` varchar(255) NOT NULL,
   `upload_time` timestamp NOT NULL DEFAULT current_timestamp(),
   `file_type` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -43,7 +43,12 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`id`, `user_email`, `file_name`, `file_path`, `description`, `passphrase`, `upload_time`, `file_type`) VALUES
-(20, 'epaphrasmakoko55@gmail.com', 'original.jpg', '../uploads/original.jpg.enc', 'jgp', 'jpg', '2024-06-28 14:19:47', 'jpg');
+(27, 'epaphrasmakoko55@gmail.com', 'pdfcoffee.com_all-challenges-flags-5-pdf-free.pdf', '/opt/lampp/htdocs/SFEDS2/uploads/pdfcoffee.com_all-challenges-flags-5-pdf-free.pdf.enc', 'pdf', 'pdf', '2024-06-29 13:32:36', 'pdf'),
+(28, 'epaphrasmakoko55@gmail.com', 'fxhacker.jpg', '/opt/lampp/htdocs/SFEDS2/uploads/fxhacker.jpg.enc', 'jpg', 'jpg', '2024-06-29 13:36:51', 'jpg'),
+(30, 'epaphrasmakoko55@gmail.com', 'possible from lectures.pdf', '/opt/lampp/htdocs/SFEDS2/uploads/possible from lectures.pdf.enc', 'pdf', 'pdf', '2024-06-29 14:05:21', 'pdf'),
+(31, 'epaphrasmakoko55@gmail.com', 'sample.mp3', '/opt/lampp/htdocs/SFEDS2/uploads/sample.mp3.enc', 'Muziki sample', 'mp3', '2024-06-29 17:01:22', 'mp3'),
+(32, 'jescakagande@gmail.com', 'MOuntain1.jpeg', '/opt/lampp/htdocs/SFEDS2/uploads/MOuntain1.jpeg.enc', 'milima', 'jpeg', '2024-06-29 19:40:28', 'jpeg'),
+(33, 'esterhaule@gmail.com', 'Lecture 1 - Malware Analysis Fundamentals.pdf', '/opt/lampp/htdocs/SFEDS2/uploads/Lecture 1 - Malware Analysis Fundamentals.pdf.enc', 'malware', 'pdf', '2024-06-29 19:50:26', 'pdf');
 
 -- --------------------------------------------------------
 
@@ -67,11 +72,12 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `phone_number`, `email`, `password`, `created_at`, `is_active`) VALUES
-(6, 'jesca', 'kagande', '255742029829', 'jescakagande@gmail.com', '$2y$10$TLF7ENgmdjlGgCgkHGYkreqS6Cfad.AQvw3dHLYnJVKxZb55XtNMG', '2024-05-22 19:14:26', 1),
-(12, 'mariel', 'fred', '255742029829', 'marielfred@gmail.com', '$2y$10$3Ok.r1OMDI.GjQS.fmFuEurdfUiV7P12PYTmToQwT0Z.2iwZF6Mla', '2024-05-22 21:14:06', 1),
-(13, 'admin', 'admin', '255742029829', 'admin@gmail.com', '$2y$10$vgc/YrZrnbSMxUCa6/yAXeeo9LH/sROBuMHmhGRTYpzUyrkTD4k9S', '2024-05-22 21:58:32', 1),
+(13, 'admin', 'admin', '255742029829', 'admin@gmail.com', '$2y$10$p9beFzfRzFovZRptdVB8COLMJ9AEs3FeWzw35amBUMumiqy0.SXAi', '2024-05-22 21:58:32', 1),
 (14, 'Epaphras', 'Makoko', '255742029829', 'epaphrasmakoko55@gmail.com', '$2y$10$lN/d45uOzWszGzCC/lgF/O6iw8MeLST8ul5TPMBF/NIzNvXAZXp1O', '2024-05-22 22:22:59', 1),
-(17, 'test', 'test', '255742029829', 'test@gmail.com', '$2y$10$I6cshYXqETuBGCI85Jy7oe2FjixMGhwQfaUupQAumK5WOeQd2U3dO', '2024-06-05 08:42:41', 1);
+(18, 'jesca', 'kagande', '255742029829', 'jescakagande@gmail.com', '$2y$10$.HuJMeM26jLUW1lKfO7FFOL4dBfxdShhJEcIneY/rtuwAiGn3f.Z.', '2024-06-29 19:39:37', 1),
+(19, 'collins', 'kimweri', '255742029829', 'collinkimweri@gmail.com', '$2y$10$OCzFZZk5jjCvUwCz1cmOdOb5DIE6j8w56xTosvwKOMoFSbMVYVWpm', '2024-06-29 19:41:34', 1),
+(20, 'ester', 'haule', '255742029829', 'esterhaule@gmail.com', '$2y$10$nVzh.v9pv.bCT2ptSpa1ounnHRxYQgj.VE5/z.YoHZdwiVBO/4y7G', '2024-06-29 19:45:21', 1),
+(21, 'mariel', 'fred', '255742029829', 'marielfred@gmail.com', '$2y$10$1z6EcHeYJQp9RPO221qLlOJgyUNVjhmhpDuBDWfJXLr/sJYuBcc0.', '2024-06-29 19:46:44', 1);
 
 --
 -- Indexes for dumped tables
@@ -99,13 +105,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
