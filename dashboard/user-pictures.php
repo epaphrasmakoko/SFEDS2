@@ -8,8 +8,8 @@ error_reporting(E_ALL);
 
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: ../index.php");
-    exit();
+  header("Location: ../index.php");
+  exit();
 }
 
 // Include database connection
@@ -19,20 +19,20 @@ include '../php/connect_db.php';
 $userEmail = $_SESSION['email'];
 
 // Fetch the user's files from the database
-$sql = "SELECT id, file_name FROM files WHERE user_email = ? AND file_type IN ('png', 'jpg', 'jpeg', 'pdf')";
+$sql = "SELECT id, file_name FROM files WHERE user_email = ? AND file_type IN ('png', 'jpg', 'jpeg')";
 $stmt = $conn->prepare($sql);
 if ($stmt === false) {
-    die('Prepare failed: ' . htmlspecialchars($conn->error));
+  die('Prepare failed: ' . htmlspecialchars($conn->error));
 }
 $stmt->bind_param("s", $userEmail);
 $stmt->execute();
 $result = $stmt->get_result();
 if ($result === false) {
-    die('Execute failed: ' . htmlspecialchars($stmt->error));
+  die('Execute failed: ' . htmlspecialchars($stmt->error));
 }
 $files = [];
 while ($row = $result->fetch_assoc()) {
-    $files[] = $row;
+  $files[] = $row;
 }
 $stmt->close();
 $conn->close();
@@ -40,6 +40,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,6 +50,7 @@ $conn->close();
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/uploads.css">
 </head>
+
 <body>
   <div class="dashboard">
     <header class="header">
@@ -88,11 +90,19 @@ $conn->close();
             </a>
           </div>
           <div>
-            <h2>Files</h2>
+          <h2><strong><u>Pictures</strong></u></h2>
           </div>
           <div class="items">
+            <?php if (isset($_SESSION['error_message'])) : ?>
+              <div class="alert alert-danger">
+                <?php
+                echo $_SESSION['error_message'];
+                unset($_SESSION['error_message']);
+                ?>
+              </div>
+            <?php endif; ?>
             <ul>
-              <?php foreach ($files as $file): ?>
+              <?php foreach ($files as $file) : ?>
                 <li>
                   <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" data-id="<?php echo $file['id']; ?>" data-name="<?php echo htmlspecialchars($file['file_name']); ?>" onclick="openModal(this)"><?php echo htmlspecialchars($file['file_name']); ?></a>
                 </li>
@@ -114,22 +124,23 @@ $conn->close();
     </footer>
   </div>
 
-  <div class="modal" id="passphraseModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+  <div class="modal fade" id="passphraseModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Enter Passphrase for <span id="fileName"></span></h5>
+          <h5 class="modal-title" id="exampleModalLabel">Enter Passphrase for <strong><span id="fileName"></span></strong></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="fileActionForm" action="../download.php" method="post">
+          <form id="fileActionForm" method="post">
             <div class="mb-3">
-              <label for="passphrase" class="form-label">Passphrase</label>
+              <label for="passphrase" class="form-label"><strong>Passphrase</strong></label>
               <input type="password" class="form-control" id="passphrase" name="passphrase" required>
               <input type="hidden" id="file_id" name="file_id">
             </div>
-            <div class="d-flex justify-content-end">
-              <button type="submit" class="btn btn-primary">Download</button>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-danger" onclick="setAction('delete')">Delete</button>
+              <button type="button" class="btn btn-primary" onclick="setAction('download')">Download</button>
             </div>
           </form>
         </div>
@@ -145,6 +156,17 @@ $conn->close();
       const passphraseModal = new bootstrap.Modal(document.getElementById('passphraseModal'));
       passphraseModal.show();
     }
+
+    function setAction(action) {
+      const form = document.getElementById('fileActionForm');
+      if (action === 'download') {
+        form.action = '../download.php';
+      } else if (action === 'delete') {
+        form.action = '../delete.php';
+      }
+      form.submit();
+    }
   </script>
 </body>
+
 </html>

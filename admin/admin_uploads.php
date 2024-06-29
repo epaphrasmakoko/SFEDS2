@@ -2,7 +2,7 @@
 // Start session
 session_start();
 
-// Enable error reporting
+// Enable error reporting (remove in production)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -17,8 +17,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['email'] !== 'admin@gmail.com') {
     exit();
 }
 
-// Fetch all users from the database
-$sql = "SELECT id, first_name, last_name, email, phone_number, is_active FROM users";
+// Fetch all uploads from the database
+$sql = "SELECT id, user_email, file_name, file_path, description, upload_time FROM files";
 $result = $conn->query($sql);
 ?>
 
@@ -28,7 +28,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Uploads Management</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="../bootstrap/bootstrap-5.3.3-dist/css/bootstrap.css">
     <link rel="stylesheet" href="../css/general.css">
@@ -50,7 +50,7 @@ $result = $conn->query($sql);
             </div>
             <div>
                 <nav class="nav">
-                    <a href="#" class="link-light">Profile</a>
+                    <a href="./admin_profile.php" class="link-light">Profile</a>
                     <a href="../php/logout.php" class="link-danger">Logout</a>
                 </nav>
             </div>
@@ -75,15 +75,15 @@ $result = $conn->query($sql);
             <!-- Main content area -->
             <div class="content">
                 <div>
-                    <h2><strong>User Management</strong></h2>
+                    <h2><strong>Uploads Management</strong></h2>
                     <hr>
                     <table class="table table-bordered table-dark table-hover">
                         <thead>
                             <tr>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
+                                <th>User Email</th>
+                                <th>File Name</th>
+                                <th>Description</th>
+                                <th>Upload Time</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -91,26 +91,23 @@ $result = $conn->query($sql);
                             <?php if ($result->num_rows > 0) {
                                 while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($row['first_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['last_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['email']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['phone_number']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['user_email']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['file_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['description']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['upload_time']); ?></td>
                                         <td>
-                                            <form action="../php/user_actions.php" method="post" style="display:inline;">
-                                                <input type="hidden" name="user_id" value="<?php echo $row['id']; ?>">
-                                                <button type="submit" name="action" value="reset_password" class="btn btn-warning btn-sm">Reset</button>
-                                                <?php if ($row['is_active']) { ?>
-                                                    <button type="submit" name="action" value="disable_user" class="btn btn-secondary btn-sm">Disable</button>
-                                                <?php } else { ?>
-                                                    <button type="submit" name="action" value="enable_user" class="btn btn-success btn-sm">Enable</button>
-                                                <?php } ?>
-                                                <button type="submit" name="action" value="delete_user" class="btn btn-danger btn-sm">Delete</button>
+                                            <!-- Download Button -->
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#downloadModal" data-file-id="<?php echo $row['id']; ?>">Download</button>
+                                            <!-- Delete Form -->
+                                            <form action="./upload_actions.php" method="post" style="display:inline;">
+                                                <input type="hidden" name="file_id" value="<?php echo $row['id']; ?>">
+                                                <button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
                             <?php }
                             } else {
-                                echo "<tr><td colspan='5'>No users found</td></tr>";
+                                echo "<tr><td colspan='5'>No uploads found</td></tr>";
                             } ?>
                         </tbody>
                     </table>
@@ -125,14 +122,6 @@ $result = $conn->query($sql);
                         <?php endif; ?>
                     </div>
                 </div>
-                <div>
-                    <h1>Welcome Admin</h1>
-                    <!-- Embedding the video -->
-                    <video autoplay loop muted class="video">
-                        <source src="../images/Lock_video.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
             </div>
         </div>
         <!-- Footer Component -->
@@ -141,8 +130,46 @@ $result = $conn->query($sql);
         </footer>
     </div>
 
+    <!-- Download Modal -->
+    <div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="downloadModalLabel">Download File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="./upload_actions.php" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="passphrase" class="form-label">Passphrase</label>
+                            <input type="password" class="form-control" id="passphrase" name="passphrase" required>
+                        </div>
+                        <input type="hidden" name="file_id" id="file-id" value="">
+                        <input type="hidden" name="action" value="download">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Download</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS (optional) -->
     <script src="../bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var downloadModal = document.getElementById('downloadModal');
+        downloadModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var fileId = button.getAttribute('data-file-id');
+            var fileIdInput = downloadModal.querySelector('#file-id');
+            console.log('File ID:', fileId); // Check if fileId is correctly fetched
+            fileIdInput.value = fileId; // Set the value of file-id input
+            console.log('File ID Input:', fileIdInput.value); // Check if fileIdInput.value is correctly set
+        });
+    </script>
+
 </body>
 
 </html>

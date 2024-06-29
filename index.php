@@ -54,12 +54,12 @@
                   <div class="invalid-feedback">Please provide a password</div>
                 </div>
                 <div class="form-group form-check">
-                  <input type="checkbox" id="rememberMe" name="rememberMe" class="form-check-input">
-                  <label for="rememberMe" class="form-check-label">Remember Me</label>
+                  <!-- <input type="checkbox" id="rememberMe" name="rememberMe" class="form-check-input"> -->
+                  <!-- <label for="rememberMe" class="form-check-label">Remember Me</label> -->
                 </div>
                 <button type="submit" class="btn btn-dark btn-block">Login</button>
                 <div class="mt-3">
-                  <a href="#" class="forgot-password link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Forgot Password?</a>
+                  <!-- <a href="#" class="forgot-password link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Forgot Password?</a> -->
                 </div>
               </form>
               <div class="mt-3">

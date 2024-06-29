@@ -44,7 +44,7 @@
                 </div>
                 <div class="form-group form-check mb-3">
                   <input type="checkbox" id="terms" name="terms" class="form-check-input" required>
-                  <label for="terms" class="form-check-label">I agree to the <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/terms">Terms of Service</a> and <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/privacy">Privacy Policy</a></label>
+                  <label for="terms" class="form-check-label">I agree to the <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="./terms.html">Terms of Service</a> and <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="./privacy.html">Privacy Policy</a></label>
                   <div class="invalid-feedback">You must agree to the terms before submitting</div>
                 </div>
                 <button type="submit" class="btn btn-dark btn-block">Register</button>

@@ -81,7 +81,7 @@ if (isset($_SESSION['upload_error'])) {
 
           <form action="./php/upload_handler.php" method="post" enctype="multipart/form-data" class="upload-form">
             <div class="form-group upload">
-              <input type="file" name="file" id="file" accept="application/pdf, image/png, image/jpeg, image/jpg" class="form-control" required>
+              <input type="file" name="file" id="file" accept="application/pdf, image/png, image/jpeg, image/jpg, audio/mpeg" class="form-control" required>
             </div>
 
             <div class="form-group upload">

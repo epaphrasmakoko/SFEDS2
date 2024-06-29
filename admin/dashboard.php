@@ -12,31 +12,44 @@ require_once '../php/connect_db.php';
 
 // Check if the user is logged in and is an admin
 if (!isset($_SESSION['loggedin']) || $_SESSION['email'] !== 'admin@gmail.com') {
-    // Redirect to login page if not logged in or not an admin
-    header("Location: ../index.php");
-    exit();
+  // Redirect to login page if not logged in or not an admin
+  header("Location: ../index.php");
+  exit();
 }
 
 // Check database connection
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+  die("Connection failed: " . mysqli_connect_error());
 }
 
 // Fetch total number of users from the database
-$sql = "SELECT COUNT(*) AS total_users FROM users";
-$result = $conn->query($sql);
-if (!$result) {
-    die("Query failed: " . $conn->error);
+$sqlUsers = "SELECT COUNT(*) AS total_users FROM users";
+$resultUsers = $conn->query($sqlUsers);
+if (!$resultUsers) {
+  die("Query failed: " . $conn->error);
 }
 
 $totalUsers = 0;
-if ($result && $row = $result->fetch_assoc()) {
-    $totalUsers = $row['total_users'];
+if ($resultUsers && $rowUsers = $resultUsers->fetch_assoc()) {
+  $totalUsers = $rowUsers['total_users'];
+}
+
+// Fetch total number of uploads from the database
+$sqlUploads = "SELECT COUNT(*) AS total_uploads FROM files";
+$resultUploads = $conn->query($sqlUploads);
+if (!$resultUploads) {
+  die("Query failed: " . $conn->error);
+}
+
+$totalUploads = 0;
+if ($resultUploads && $rowUploads = $resultUploads->fetch_assoc()) {
+  $totalUploads = $rowUploads['total_uploads'];
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,6 +59,7 @@ if ($result && $row = $result->fetch_assoc()) {
   <link rel="stylesheet" href="../css/general.css">
   <link rel="stylesheet" href="../css/dashboard.css">
 </head>
+
 <body>
   <div class="dashboard">
     <!-- Header Component -->
@@ -74,24 +88,27 @@ if ($result && $row = $result->fetch_assoc()) {
           <hr>
           <li><a class="link-light" href="./dashboard.php">Dashboard</a></li>
           <hr>
-          <li><a class="link-light" href="./user-management.php">Users</a></li>
+          <li><a class="link-light" href="./user-management.php">All Users</a></li>
           <hr>
-          <li><a class="link-light" href="#">Uploads</a></li>
+          <li><a class="link-light" href="./admin_uploads.php">All Uploads</a></li>
           <hr>
-          <li><a class="link-light" href="#">Profile</a></li>
+          <li><a class="link-light" href="./admin_profile.php">Profile</a></li>
           <hr>
-          <li><a class="link-light" href="#">Logs</a></li>
-          <hr>
+          <!-- <li><a class="link-light" href="#">Logs</a></li> -->
         </ul>
       </aside>
       <!-- Main content area -->
       <div class="content">
         <div>
+          <h1><strong>Dashboard</h1>
+          <hr><br><br>
           <h2>Total Users: <strong><?php echo $totalUsers; ?></strong></h2> <!-- Dynamic total users count -->
+          <hr>
+          <h2>Total Uploads: <strong><?php echo $totalUploads; ?></strong></h2> <!-- Dynamic total uploads count -->
         </div>
         <div>
           <h1>Welcome Admin</h1>
-            <!-- Embedding the video -->
+          <!-- Embedding the video -->
           <video autoplay loop muted class="video">
             <source src="../images/Lock_video.mp4" type="video/mp4">
             Your browser does not support the video tag.
@@ -99,7 +116,7 @@ if ($result && $row = $result->fetch_assoc()) {
         </div>
       </div>
     </div>
-    
+
     <!-- Footer Component -->
     <footer class="footer">
       <p>&copy; 2024 CSDFE3 Group. All rights reserved.</p>
@@ -109,4 +126,5 @@ if ($result && $row = $result->fetch_assoc()) {
   <!-- Bootstrap JS (optional) -->
   <script src="../bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

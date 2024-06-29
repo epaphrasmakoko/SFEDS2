@@ -18,16 +18,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sql = "SELECT file_name, file_path, passphrase FROM files WHERE id = ?";
     $stmt = $conn->prepare($sql);
     if ($stmt === false) {
-        die('Prepare failed: ' . htmlspecialchars($conn->error));
+        $_SESSION['error_message'] = 'Prepare failed: ' . htmlspecialchars($conn->error);
+        header("Location: ./dashboard/user-pictures.php");
+        exit();
     }
     $stmt->bind_param("i", $fileId);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result === false) {
-        die('Execute failed: ' . htmlspecialchars($stmt->error));
+        $_SESSION['error_message'] = 'Execute failed: ' . htmlspecialchars($stmt->error);
+        header("Location: ./dashboard/user-pictures.php");
+        exit();
     }
     if ($result->num_rows == 0) {
-        die('File not found.');
+        $_SESSION['error_message'] = 'File not found.';
+        header("Location: ./dashboard/user-pictures.php");
+        exit();
     }
 
     $file = $result->fetch_assoc();
@@ -36,16 +42,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $encryptedFilePath = $file['file_path'];
     $originalFileName = $file['file_name'];
 
+    // Debug: Check if the encrypted file path is correct
+    $absoluteEncryptedFilePath = realpath($encryptedFilePath);
+    if ($absoluteEncryptedFilePath === false) {
+        $_SESSION['error_message'] = 'Error: Encrypted file does not exist at path: ' . $encryptedFilePath;
+        header("Location: ./dashboard/user-pictures.php");
+        exit();
+    }
+
     // Check if the provided passphrase matches the one in the database
     if ($file['passphrase'] !== $passphrase) {
-        die('Incorrect passphrase.');
+        $_SESSION['error_message'] = 'Incorrect passphrase.';
+        header("Location: ./dashboard/user-pictures.php");
+        exit();
     }
 
     // Decrypt the file
     try {
-        $decryptedFilePath = decryptFile($encryptedFilePath, $passphrase);
+        $decryptedFilePath = decryptFile($absoluteEncryptedFilePath, $passphrase);
     } catch (Exception $e) {
-        die('Error decrypting file: ' . $e->getMessage());
+        $_SESSION['error_message'] = 'Error decrypting file: ' . $e->getMessage();
+        header("Location: ./dashboard/user-pictures.php");
+        exit();
     }
 
     // Check if the decrypted file exists and its size
@@ -63,16 +81,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         unlink($decryptedFilePath);
         exit();
     } else {
-        die('Decrypted file not found.');
+        $_SESSION['error_message'] = 'Error: Decrypted file does not exist.';
+        header("Location: ./dashboard/user-pictures.php");
+        exit();
     }
 } else {
-    header("Location: ../index.php");
+    header("Location: ../dashboard.php");
     exit();
 }
 
 function decryptFile($encryptedFilePath, $passphrase) {
     $decryptedFilePath = str_replace('.enc', '', $encryptedFilePath);
-    $command = "openssl enc -d -aes-256-cbc -in $encryptedFilePath -out $decryptedFilePath -k $passphrase 2>&1";
+    $absoluteEncryptedFilePath = escapeshellarg($encryptedFilePath);
+    $absoluteDecryptedFilePath = escapeshellarg($decryptedFilePath);
+    $passphrase = escapeshellarg($passphrase);
+    $command = "openssl enc -d -aes-256-cbc -in $absoluteEncryptedFilePath -out $absoluteDecryptedFilePath -k $passphrase 2>&1";
     exec($command, $output, $returnVar);
     if ($returnVar !== 0) {
         throw new Exception("Error decrypting file: " . implode("\n", $output));

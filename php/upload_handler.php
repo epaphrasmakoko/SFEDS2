@@ -1,40 +1,44 @@
 <?php
 session_start();
 
+// Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Redirect if not logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: ../index.php");
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Include database connection
-    include 'connect_db.php';
+// Include database connection
+include 'connect_db.php';
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $userEmail = $_SESSION['email'];
-    $description = $_POST['description'];
+    $description = $_POST['description'] ?? ''; // Default to an empty string if not set
     $passphrase = $_POST['passphrase'];
 
     $targetDir = "../uploads/";
     $fileName = basename($_FILES["file"]["name"]);
     $targetFile = $targetDir . $fileName;
-    $uploadOk = 1;
     $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
     // Valid file types for encryption
-    $validTypes = ["pdf", "png", "jpg", "jpeg"];
+    $validTypes = ["pdf", "png", "jpg", "jpeg", "mp3", "mp4"];
 
     // Check if file type is valid
     if (!in_array($fileType, $validTypes)) {
-        $_SESSION['upload_error'] = "Sorry, only PDF, PNG, JPEG files are allowed for now.";
+        $_SESSION['upload_error'] = "Sorry, only PDF, PNG, JPEG, MP3 and MP4 files are allowed for now.";
         header("Location: ../upload.php");
         exit();
     }
 
     // Move the uploaded file to the target directory
     if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFile)) {
-        // Encrypt the file
         try {
+            // Encrypt the file
             $encryptedFilePath = encryptFile($targetFile, $passphrase);
 
             // Delete the original file after successful encryption
@@ -76,11 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 function encryptFile($filePath, $passphrase) {
     $encryptedFilePath = $filePath . '.enc';
-    $command = "openssl enc -aes-256-cbc -in $filePath -out $encryptedFilePath -k $passphrase 2>&1";
+    $absoluteFilePath = realpath($filePath);
+    $command = "openssl enc -aes-256-cbc -salt -in \"" . $absoluteFilePath . "\" -out \"" . $encryptedFilePath . "\" -pass pass:" . escapeshellarg($passphrase) . " 2>&1";
     exec($command, $output, $returnVar);
     if ($returnVar !== 0) {
         throw new Exception("Error encrypting file: " . implode("\n", $output));
     }
-    return $encryptedFilePath;
+    return realpath($encryptedFilePath);
 }
 ?>

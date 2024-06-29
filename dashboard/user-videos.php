@@ -1,30 +1,58 @@
 <?php
-// Start session
 session_start();
+
+// Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // Redirect to login page
-    header("Location: ../index.php");
-    exit();
+  header("Location: ../index.php");
+  exit();
 }
+
+// Include database connection
+include '../php/connect_db.php';
+
+// Get the logged-in user's email
+$userEmail = $_SESSION['email'];
+
+// Fetch the user's files from the database
+$sql = "SELECT id, file_name FROM files WHERE user_email = ? AND file_type IN ('mp4')";
+$stmt = $conn->prepare($sql);
+if ($stmt === false) {
+  die('Prepare failed: ' . htmlspecialchars($conn->error));
+}
+$stmt->bind_param("s", $userEmail);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result === false) {
+  die('Execute failed: ' . htmlspecialchars($stmt->error));
+}
+$files = [];
+while ($row = $result->fetch_assoc()) {
+  $files[] = $row;
+}
+$stmt->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
-  <!-- Bootstrap CSS -->
   <link href="../bootstrap/bootstrap-5.3.3-dist/css/bootstrap.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/general.css">
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/uploads.css">
 </head>
+
 <body>
   <div class="dashboard">
-    <!-- Header Component -->
     <header class="header">
       <div class="logo">
         <figure>
@@ -42,48 +70,48 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         </nav>
       </div>
     </header>
-    <!-- Main Component -->
     <div class="main">
-      <!-- Sidebar Component -->
       <aside class="sidebar">
         <ul>
           <hr>
           <li><a class="link-light" href="../dashboard.php">Dashboard</a></li>
           <hr>
-          <li><a class="link-light" href="#">Upload</a></li>
+          <li><a class="link-light" href="../upload.php">Upload</a></li>
           <hr>
-          <li><a class="link-light" href="#">Profile</a></li>
+          <li><a class="link-light" href="../profile.php">Profile</a></li>
           <hr>
         </ul>
       </aside>
-      <!-- Main content area -->
       <div class="content">
-      <div class="document-folder">
-    <div class="arrow">
-      <a href="../dashboard.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-        <img src="../images/arrow-92-256.png" alt="Back" class="back-icon"> Back
-      </a>
-    </div>
-    <div>
-      <h2>Documents</h2>
-    </div>
-    <div class="items">
-      <ul>
-        <li>
-            <a class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/files/TITLES.pdf" download>Titles</a>
-        </li>
-        <li>
-          <a class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="@/assets/student.png" download>Sample Document 2</a>
-        </li>
-        <li>
-          <a class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/files/StudentLogo.png" download>Sample Document 3</a>
-        </li>
-      </ul>
-    </div>
-  </div>
+        <div class="document-folder">
+          <div class="arrow">
+            <a href="../dashboard.php" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+              <img src="../images/arrow-92-256.png" alt="Back" class="back-icon"> Back
+            </a>
+          </div>
+          <div>
+          <h2><strong><u>Videos</strong></u></h2>
+          </div>
+          <div class="items">
+            <?php if (isset($_SESSION['error_message'])) : ?>
+              <div class="alert alert-danger">
+                <?php
+                echo $_SESSION['error_message'];
+                unset($_SESSION['error_message']);
+                ?>
+              </div>
+            <?php endif; ?>
+            <ul>
+              <?php foreach ($files as $file) : ?>
+                <li>
+                  <a href="#" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" data-id="<?php echo $file['id']; ?>" data-name="<?php echo htmlspecialchars($file['file_name']); ?>" onclick="openModal(this)"><?php echo htmlspecialchars($file['file_name']); ?></a>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        </div>
         <div>
           <h1>Welcome <?php echo htmlspecialchars($_SESSION['first_name']); ?></h1>
-            <!-- Embedding the video -->
           <video autoplay loop muted class="video">
             <source src="../images/Lock_video.mp4" type="video/mp4">
             Your browser does not support the video tag.
@@ -91,13 +119,54 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         </div>
       </div>
     </div>
-    <!-- Footer Component -->
     <footer class="footer">
-      <p>&copy; 2024 CSDFE3 Group. All rights reserved.</p>
+      <p>&copy; 2024 CSDFE3 Group . All rights reserved.</p>
     </footer>
   </div>
 
-  <!-- Bootstrap JS (optional) -->
+  <div class="modal fade" id="passphraseModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Enter Passphrase for <strong><span id="fileName"></span></strong></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="fileActionForm" method="post">
+            <div class="mb-3">
+              <label for="passphrase" class="form-label"><strong>Passphrase</strong></label>
+              <input type="password" class="form-control" id="passphrase" name="passphrase" required>
+              <input type="hidden" id="file_id" name="file_id">
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-danger" onclick="setAction('delete')">Delete</button>
+              <button type="button" class="btn btn-primary" onclick="setAction('download')">Download</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="../bootstrap/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function openModal(element) {
+      document.getElementById('file_id').value = element.getAttribute('data-id');
+      document.getElementById('fileName').textContent = element.getAttribute('data-name');
+      const passphraseModal = new bootstrap.Modal(document.getElementById('passphraseModal'));
+      passphraseModal.show();
+    }
+
+    function setAction(action) {
+      const form = document.getElementById('fileActionForm');
+      if (action === 'download') {
+        form.action = '../download.php';
+      } else if (action === 'delete') {
+        form.action = '../delete.php';
+      }
+      form.submit();
+    }
+  </script>
 </body>
+
 </html>
