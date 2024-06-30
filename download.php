@@ -51,7 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Check if the provided passphrase matches the one in the database
-    if ($file['passphrase'] !== $passphrase) {
+    if (!password_verify($passphrase, $file['passphrase'])) {
+        // if ($file['passphrase'] !== $passphrase) {
         $_SESSION['error_message'] = 'Incorrect passphrase.';
         header("Location: ./dashboard/user-pictures.php");
         exit();

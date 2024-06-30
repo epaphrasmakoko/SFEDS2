@@ -38,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Move the uploaded file to the target directory
     if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFile)) {
         try {
+            $hashedPassphrase = password_hash($passphrase, PASSWORD_DEFAULT);
+
             // Encrypt the file
             $encryptedFilePath = encryptFile($targetFile, $passphrase);
 
@@ -51,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Save file metadata to the database
             $sql = "INSERT INTO files (user_email, file_name, file_path, description, passphrase, file_type) VALUES (?, ?, ?, ?, ?, ?)";
             if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("ssssss", $userEmail, $fileName, $encryptedFilePath, $description, $passphrase, $fileType);
+                $stmt->bind_param("ssssss", $userEmail, $fileName, $encryptedFilePath, $description, $hashedPassphrase, $fileType);
                 if ($stmt->execute()) {
                     $_SESSION['upload_success'] = "The file has been uploaded and encrypted.";
                     header("Location: ../upload.php");
